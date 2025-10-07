@@ -14,22 +14,31 @@
             height: 100vh;
             overflow: hidden;
         }
-        
+
+        #layout {
+            display: grid;
+            grid-template-columns: 1fr minmax(260px, 320px);
+            grid-gap: 20px;
+            height: 100%;
+        }
+
         #terminal {
+            border-right: 1px solid rgba(0, 255, 0, 0.25);
             height: calc(100vh - 40px);
             overflow-y: auto;
             padding-bottom: 20px;
+            padding-right: 20px;
         }
-        
+
         .input-line {
             display: flex;
             margin-bottom: 10px;
         }
-        
+
         .prompt {
             margin-right: 10px;
         }
-        
+
         #input {
             background-color: transparent;
             border: none;
@@ -39,33 +48,129 @@
             outline: none;
             flex-grow: 1;
         }
-        
+
         .command {
             color: #00ff00;
             margin-bottom: 5px;
         }
-        
+
         .output {
             white-space: pre-line;
             margin-bottom: 15px;
             line-height: 1.4;
         }
-        
+
         .welcome {
             margin-bottom: 20px;
+        }
+
+        #config-panel {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+
+        #config-panel h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        #config-info {
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        #config-area {
+            background-color: rgba(0, 0, 0, 0.65);
+            border: 1px solid rgba(0, 255, 0, 0.35);
+            border-radius: 4px;
+            color: #00ff00;
+            flex-grow: 1;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            padding: 10px;
+            resize: none;
+        }
+
+        #config-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: rgba(0, 255, 0, 0.12);
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            border-radius: 4px;
+            color: #00ff00;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        button:hover {
+            background-color: rgba(0, 255, 0, 0.25);
+        }
+
+        #config-error {
+            color: #ff4444;
+            font-size: 12px;
+            min-height: 18px;
+            margin-top: 6px;
+            white-space: pre-line;
+        }
+
+        @media (max-width: 900px) {
+            #layout {
+                grid-template-columns: 1fr;
+            }
+
+            #terminal {
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 255, 0, 0.25);
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+
+            #config-panel {
+                height: auto;
+            }
+
+            #config-area {
+                min-height: 180px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="terminal">
-        <div class="welcome">
-            <div>Добро пожаловать в архивный терминал CR-742/1-Delta</div>
-            <div>Введите "help" для списка доступных команд</div>
+    <div id="layout">
+        <div id="terminal">
+            <div class="welcome">
+                <div>Добро пожаловать в архивный терминал CR-742/1-Delta</div>
+                <div>Введите "help" для списка доступных команд</div>
+            </div>
+            <div id="history"></div>
+            <div class="input-line">
+                <span class="prompt">$</span>
+                <input type="text" id="input" autofocus>
+            </div>
         </div>
-        <div id="history"></div>
-        <div class="input-line">
-            <span class="prompt">$</span>
-            <input type="text" id="input" autofocus>
+        <div id="config-panel">
+            <h2>Настройка команд</h2>
+            <div id="config-info">
+                Измените JSON, чтобы добавить команды или изменить выдаваемые сообщения.<br>
+                Доступные типы: <strong>response</strong> (статический ответ), <strong>responses</strong> (ответы по аргументам),
+                <strong>clear</strong> (очистка истории). Если команда с аргументами, используйте поле <code>responses</code> и необязательные
+                <code>requiresArgument</code>/<code>notFound</code>.
+            </div>
+            <textarea id="config-area"></textarea>
+            <div id="config-buttons">
+                <button id="apply-config">Применить</button>
+                <button id="reset-config">Сбросить</button>
+            </div>
+            <div id="config-error"></div>
         </div>
     </div>
 
@@ -73,32 +178,27 @@
         const terminal = document.getElementById('terminal');
         const history = document.getElementById('history');
         const input = document.getElementById('input');
-        
-        const commands = {
-            help: {
-                description: 'Список доступных команд',
-                execute: () => `Доступные команды:
-- help - показать это сообщение
-- clear - очистить терминал
-- cat <файл> - просмотреть файл
-  Доступные файлы:
-    incident_report_4511.txt
-- run <процедура> - выполнить процедуру
-  Доступные процедуры:
-    cognitive_dossier`
+        const configArea = document.getElementById('config-area');
+        const applyConfigButton = document.getElementById('apply-config');
+        const resetConfigButton = document.getElementById('reset-config');
+        const configError = document.getElementById('config-error');
+
+        const defaultCommandsConfig = {
+            "help": {
+                "description": "Список доступных команд",
+                "usage": "help",
+                "response": "Доступные команды выводятся автоматически."
             },
-            clear: {
-                description: 'Очистить терминал',
-                execute: () => {
-                    history.innerHTML = '';
-                    return null;
-                }
+            "clear": {
+                "description": "Очистить терминал",
+                "usage": "clear",
+                "type": "clear"
             },
-            cat: {
-                description: 'Просмотреть содержимое файла',
-                execute: (file) => {
-                    const files = {
-                        'incident_report_4511.txt': `📎 Протокол CR.7-В: Постинцидентный отчёт
+            "cat": {
+                "description": "Просмотреть содержимое файла",
+                "usage": "cat <файл>",
+                "responses": {
+                    "incident_report_4511.txt": `📎 Протокол CR.7-В: Постинцидентный отчёт
 Объект наблюдения: Индивидуум, позднее идентифицированный как Дельмандо Джеремайн, гражданин Союза, возраст: 38 лет.
 Особые характеристики: Незарегистрированная телепатическая активность, подтверждённая аудиофрагментами соседей, а также нейроактивным резонансом в месте задержания.
 
@@ -112,41 +212,26 @@
 Возраст: 67 лет
 Профиль: пенсионер, домохозяйка
 Причина прибытия к объекту наблюдения: доставка пищи по личной инициативе.`,
-                        'protocol_9k.txt': `📎 Протокол 9-К: Меры реагирования
+                    "protocol_9k.txt": `📎 Протокол 9-К: Меры реагирования
 Через 72 часа после события, по анонимному доносу (идентифицирован: сосед, ранее упомянутый как друг подозреваемого), объект был обнаружен в подвальном помещении жилищного блока, не оказывав сопротивления.
 
-«Наблюдались следы полусознательного когнитивного шторма, эмоциональное притупление, расфокусировка взгляда. На все вопросы отвечал утвердительно, но без содержания. Упоминал "зеркало под кожей" и "кошку на потолке".»
-
-На основании статьи 12/В «О безопасности ментального поля» и решения Временной Коллегии Оценки Угроз объект был признан угрозой 4-го уровня и подлежал утилизации через казнь без восстановления.`,
-                        'protocol_11m.txt': `📎 Протокол 11-М: Вторичное использование когнитивного остатка
-С согласия Отдела Восстановительных Технологий, до утилизации была извлечена мозговая жидкость объекта, обладавшая нестандартной ментальной структурой, пригодной для вживления.
-
-«Материал направлен в производство серии JER1mm (единицы 1–374) по протоколу срочного копирования. Особенности поведения признаны ценными для разработки моделей с расширенным уровнем импровизации в нестабильной среде.»`
-                    };
-
-                    const fileKey = Object.keys(files).find(
-                        key => key.toLowerCase() === file.toLowerCase()
-                    );
-
-                    if (fileKey) {
-                        return files[fileKey];
-                    } else {
-                        return `Файл "${file}" не найден. Доступные файлы: ${Object.keys(files).join(', ')}`;
-                    }
-                }
+«Наблюдались следы полусознательного когнитивного шторма, эмоциональное притупление, расфокусировка взгляда. На все вопросы отвечал с задержкой, стандартные проверки на резонанс — положительные.»`
+                },
+                "requiresArgument": "Укажите файл. Доступные файлы: {options}",
+                "notFound": "Файл \"{arg}\" не найден. Доступные файлы: {options}"
             },
-            run: {
-                description: 'Выполнить процедуру',
-                execute: (procedure) => {
-                    const procedures = {
-                        'cognitive_dossier': `Когнитивное досье: Единица JER1mm1
+            "run": {
+                "description": "Выполнить процедуру",
+                "usage": "run <процедура>",
+                "responses": {
+                    "cognitive_dossier": `Когнитивное досье: Единица JER1mm1
 Файл №: CR-742/1-Delta/74
 Статус: Активна
 Происхождение личности: Дельмандо Джеремайн
 Базовая конструкция: реконструированная телепатическая матрица
 Дата извлечения когнитивного материала: 07.09.184-P
 Распоряжение на перезапись: утверждено Отделом Управления Личностным Следом (ОУЛС)`,
-                        'memory_flashback_1': `📓 Всплески / отклики / постэхо
+                    "memory_flashback_1": `📓 Всплески / отклики / постэхо
 (зафиксированы в фазе сна, инициатор: JER1mm1)
 
 Свет на лестнице был оранжевый, как ржавчина.
@@ -165,7 +250,7 @@
 ...не может быть столько...
 
 Улица была пуста. Только кошка, греющаяся на стене, и семь ворон, кружащих над балконом.`,
-                        'memory_flashback_2': `📓 Отголоски
+                    "memory_flashback_2": `📓 Отголоски
 JER1mm1 стоит посреди коридора.
 На полу — грязь, но не от ног. Кровь? Нет. Грязь.
 Панель вентиляции шепчет — по слогам, по именам.
@@ -179,20 +264,109 @@ JER1mm1 стоит посреди коридора.
 Вспышка.
 
 Кто-то стучится в дверь.`
-                    };
-
-                    const procedureKey = Object.keys(procedures).find(
-                        key => key.toLowerCase() === procedure.toLowerCase()
-                    );
-
-                    if (procedureKey) {
-                        return procedures[procedureKey];
-                    } else {
-                        return `Процедура "${procedure}" не найдена. Доступные процедуры: ${Object.keys(procedures).join(', ')}`;
-                    }
-                }
+                },
+                "requiresArgument": "Укажите процедуру. Доступные процедуры: {options}",
+                "notFound": "Процедура \"{arg}\" не найдена. Доступные процедуры: {options}"
             }
         };
+
+        let commandsConfig = JSON.parse(JSON.stringify(defaultCommandsConfig));
+        let commands = {};
+
+        function normalizeCommandName(name) {
+            return name.trim().toLowerCase();
+        }
+
+        function formatOptions(responses) {
+            return Object.keys(responses).join(', ');
+        }
+
+        function createHelpText() {
+            const lines = ['Доступные команды:'];
+            Object.entries(commands)
+                .filter(([name]) => name !== 'help')
+                .forEach(([_, descriptor]) => {
+                    const usage = descriptor.usage ? ` - ${descriptor.usage}` : '';
+                    const description = descriptor.description ? ` — ${descriptor.description}` : '';
+                    lines.push(`${descriptor.originalName}${usage}${description}`);
+
+                    if (descriptor.responses) {
+                        lines.push(`    ${formatOptions(descriptor.responses)}`);
+                    }
+                });
+            return lines.join('\n');
+        }
+
+        function buildCommandsFromConfig() {
+            commands = {};
+            Object.entries(commandsConfig).forEach(([name, config]) => {
+                if (!config || typeof config !== 'object') {
+                    return;
+                }
+
+                const normalized = normalizeCommandName(name);
+                const descriptor = {
+                    originalName: name,
+                    description: config.description || '',
+                    usage: config.usage || '',
+                    responses: config.responses && typeof config.responses === 'object' ? config.responses : null,
+                    type: config.type || 'response',
+                    requiresArgument: config.requiresArgument || 'Необходимо указать аргумент.',
+                    notFound: config.notFound || 'Значение "{arg}" не найдено. Доступные варианты: {options}',
+                    response: config.response || ''
+                };
+
+                descriptor.execute = (argument = '') => {
+                    if (descriptor.type === 'clear') {
+                        history.innerHTML = '';
+                        return null;
+                    }
+
+                    if (descriptor.responses) {
+                        if (!argument) {
+                            return descriptor.requiresArgument.replace('{options}', formatOptions(descriptor.responses));
+                        }
+
+                        const key = Object.keys(descriptor.responses).find(option => option.toLowerCase() === argument.toLowerCase());
+
+                        if (key) {
+                            return descriptor.responses[key];
+                        }
+
+                        return descriptor.notFound
+                            .replace('{arg}', argument)
+                            .replace('{options}', formatOptions(descriptor.responses));
+                    }
+
+                    return descriptor.response;
+                };
+
+                commands[normalized] = descriptor;
+            });
+
+            if (!commands.help) {
+                commands.help = {
+                    originalName: 'help',
+                    description: 'Список доступных команд',
+                    usage: 'help',
+                    execute: () => createHelpText()
+                };
+            } else {
+                const originalExecute = commands.help.execute;
+                commands.help.execute = (arg) => {
+                    const base = typeof originalExecute === 'function' ? originalExecute(arg) : commands.help.response || '';
+                    const list = createHelpText();
+                    if (base && base.trim() && base.trim() !== 'Доступные команды выводятся автоматически.') {
+                        return `${base}\n\n${list}`;
+                    }
+                    return list;
+                };
+            }
+        }
+
+        function updateConfigArea() {
+            configArea.value = JSON.stringify(commandsConfig, null, 4);
+        }
 
         function addCommandToHistory(command) {
             const commandElement = document.createElement('div');
@@ -203,23 +377,23 @@ JER1mm1 стоит посреди коридора.
 
         function addOutputToHistory(output) {
             if (output === null) return;
-            
+
             const outputElement = document.createElement('div');
             outputElement.className = 'output';
             outputElement.textContent = output;
             history.appendChild(outputElement);
-            
+
             // Прокрутка к низу терминала
             terminal.scrollTop = terminal.scrollHeight;
         }
 
         function processCommand(command) {
             addCommandToHistory(command);
-            
+
             const parts = command.split(' ');
             const cmd = parts[0].toLowerCase();
             const arg = parts.slice(1).join(' ');
-            
+
             if (commands[cmd]) {
                 const output = commands[cmd].execute(arg);
                 addOutputToHistory(output);
@@ -243,6 +417,30 @@ JER1mm1 стоит посреди коридора.
         terminal.addEventListener('click', function() {
             input.focus();
         });
+
+        applyConfigButton.addEventListener('click', () => {
+            configError.textContent = '';
+            try {
+                const parsed = JSON.parse(configArea.value);
+                commandsConfig = parsed;
+                buildCommandsFromConfig();
+                addOutputToHistory('Конфигурация команд обновлена.');
+            } catch (error) {
+                configError.textContent = `Ошибка парсинга: ${error.message}`;
+            }
+        });
+
+        resetConfigButton.addEventListener('click', () => {
+            commandsConfig = JSON.parse(JSON.stringify(defaultCommandsConfig));
+            buildCommandsFromConfig();
+            updateConfigArea();
+            configError.textContent = '';
+            addOutputToHistory('Конфигурация сброшена к значениям по умолчанию.');
+        });
+
+        // Инициализация
+        buildCommandsFromConfig();
+        updateConfigArea();
     </script>
 </body>
 </html>
