@@ -1,1 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Дун Чжуншу (董仲舒, ок. 179–104 до н.э.) — сайт‑презентация</title>
+  <style>
+    :root {
+      --bg: #0a0b0e;
+      --panel: #11141a;
+      --accent: #7cc0ff;
+      --muted: #a8b3cf;
+      --text: #e7ecf6;
+      --card: #0f1320;
+      --ring: rgba(124,192,255,.35);
+    }
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Noto Sans", Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 80% -10%, #14233a 0%, var(--bg) 60%);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none }
+    a:hover { text-decoration: underline }
+    header.topbar {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(10,11,14,.8), rgba(10,11,14,.55));
+      border-bottom: 1px solid rgba(124,192,255,.15);
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 18px 20px }
+    .brand { display:flex; align-items:center; gap:12px }
+    .brand .dot { width:12px; height:12px; border-radius:50%; background: var(--accent); box-shadow: 0 0 0 6px var(--ring) }
+    .brand h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: .2px }
+    nav { display:flex; gap: 12px; flex-wrap: wrap; margin-top: 10px }
+    nav a { padding: 6px 10px; border-radius: 999px; background: #0b101b; border: 1px solid rgba(124,192,255,.2); color: var(--muted); font-size: 14px }
+    nav a:hover { border-color: var(--accent); color: var(--text) }
 
+    .hero { display:grid; grid-template-columns: 1.2fr .8fr; gap: 24px; align-items: center; padding: 28px 20px 12px }
+    .hero h2 { font-size: 40px; line-height: 1.15; margin: 0 0 10px 0 }
+    .hero p { margin-top: 8px; color: var(--muted); font-size: 18px }
+    .hero .card { background: linear-gradient(180deg, #0f1320, #0b0f19); border: 1px solid rgba(124,192,255,.18); border-radius: 18px; overflow: hidden }
+    .hero img { width: 100%; height: auto; display:block }
+    .caption { font-size: 12px; color: var(--muted); padding: 8px 10px; border-top: 1px dashed rgba(124,192,255,.25) }
+
+    section { padding: 24px 20px }
+    .grid { display:grid; grid-template-columns: repeat(12, 1fr); gap: 18px }
+    .span-12 { grid-column: span 12 }
+    .span-8 { grid-column: span 8 }
+    .span-4 { grid-column: span 4 }
+
+    .card {
+      background: linear-gradient(180deg, #0f1320, #0b0f19);
+      border: 1px solid rgba(124,192,255,.18);
+      border-radius: 16px; padding: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
+    }
+    h3 { margin: 0 0 10px 0; font-size: 22px }
+    h4 { margin: 10px 0 6px 0; font-size: 18px; color: var(--accent) }
+    ul { margin: 8px 0 8px 20px; padding: 0 }
+    li { margin: 6px 0 }
+
+    .note { border-left: 3px solid var(--accent); padding-left: 12px; color: var(--muted) }
+    .kpi { display:flex; gap:14px; flex-wrap: wrap }
+    .pill { padding: 6px 10px; border: 1px solid rgba(124,192,255,.25); border-radius: 999px; background:#0b101b; color: var(--muted); font-size: 13px }
+
+    .footer { color: var(--muted); font-size: 14px; padding-bottom: 40px }
+
+    .controls { display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px }
+    .btn {
+      appearance: none; border:1px solid rgba(124,192,255,.3); background:#0c1220; color:var(--text);
+      padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600
+    }
+    .btn:hover { border-color: var(--accent) }
+
+    .gallery { display:grid; grid-template-columns: repeat(2, 1fr); gap: 16px }
+    .gallery figure { margin: 0; overflow: hidden; border-radius: 14px; border: 1px solid rgba(124,192,255,.18); background: #0b0f17 }
+    .gallery img { width: 100%; height: auto; display:block }
+    .gallery figcaption { font-size: 12px; color: var(--muted); padding: 8px 10px; border-top: 1px dashed rgba(124,192,255,.25) }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .span-8, .span-4 { grid-column: span 12 }
+      .gallery { grid-template-columns: 1fr }
+    }
+  </style>
+  <script>
+    function printDeck(){ window.print() }
+    function scrollToId(id){ document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'}) }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        <span class="dot"></span>
+        <h1>Дун Чжуншу — конфуцианство, инь‑ян и «пять элементов»</h1>
+      </div>
+      <nav>
+        <a href="#bio" onclick="scrollToId('bio')">Биография</a>
+        <a href="#context" onclick="scrollToId('context')">Контекст</a>
+        <a href="#doctrine" onclick="scrollToId('doctrine')">Учение</a>
+        <a href="#works" onclick="scrollToId('works')">Сочинения</a>
+        <a href="#politics" onclick="scrollToId('politics')">Политическая мысль</a>
+        <a href="#legacy" onclick="scrollToId('legacy')">Наследие</a>
+        <a href="#gallery" onclick="scrollToId('gallery')">Иллюстрации</a>
+        <a href="#sources" onclick="scrollToId('sources')">Источники</a>
+      </nav>
+      <div class="controls">
+        <button class="btn" onclick="printDeck()">Печать / PDF</button>
+        <a class="btn" href="#sources">Перейти к источникам</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero card">
+      <div>
+        <h2>Дун Чжуншу (董仲舒, ок. 179–104 до н.э.)</h2>
+        <p>
+          Один из ключевых мыслителей ранней имперской эпохи Хань. Традиционно считается главным идеологом
+          превращения конфуцианства в государственную доктрину. Соединил этику Конфуция с космологией инь–ян и
+          доктриной «пяти элементов» (у‑син), разработал теорию «резонанса Неба и человека» (天人感應) и
+          интерпретацию «Весен и Осеней» в русле школы «Гунъян».
+        </p>
+        <div class="kpi">
+          <span class="pill">Хань У‑ди и придворные диспуты</span>
+          <span class="pill">Теория ганьин — «стимул‑отклик»</span>
+          <span class="pill">Университет Тайсюэ и отбор кадров</span>
+        </div>
+      </div>
+      <figure class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/%E6%AD%B7%E4%BB%A3%E8%81%96%E8%B3%A2%E5%8D%8A%E8%BA%AB%E5%83%8F_%E5%86%8A_%E8%91%A3%E4%BB%B2%E8%88%92_%28Dong_Zhongshu%29.png/800px-%E6%AD%B7%E4%BB%A3%E8%81%96%E8%B3%A2%E5%8D%8A%E8%BA%AB%E5%83%8F_%E5%86%8A_%E8%91%A3%E4%BB%B2%E8%88%92_%28Dong_Zhongshu%29.png" alt="Портрет Дуна Чжуншу, Национальный музей дворца, Тайбэй" />
+        <figcaption class="caption">Портрет Дуна Чжуншу (Национальный дворцовый музей, Тайбэй / Wikimedia Commons)</figcaption>
+      </figure>
+    </section>
+
+    <section id="bio" class="grid">
+      <article class="card span-8">
+        <h3>Краткая биография</h3>
+        <p>
+          Родился в уезде Гуанчуань (совр. пров. Хэбэй). Начал службу при императоре Цзине, поднялся при У‑ди.
+          Преследовался за «дерзкие» трактовки небесных знамений, но оставался влиятельным советником. Позднее
+          удалился и занимался преподаванием и сочинительством. Смерть датируется ок. 104 до н.э.
+        </p>
+        <p class="note">Даты и подробности ранней биографии в источниках расходятся; традиционная версия приводится в
+          «Ханьшу» и поздней историографии.</p>
+      </article>
+      <aside class="card span-4">
+        <h4>Хронология (опорные точки)</h4>
+        <ul>
+          <li>ок. 179 до н.э. — рождение (Гуанчуань).</li>
+          <li>ок. 140–130‑е — участие в придворных диспутах при У‑ди.</li>
+          <li>ок. 134 до н.э. — знаменитые записки к престолу («Три ответа», 天人三策).</li>
+          <li>поздние годы — преподавание, «Весны и Осеней. Пышная роса».</li>
+          <li>ок. 104 до н.э. — смерть.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="context" class="grid">
+      <article class="card span-12">
+        <h3>Интеллектуальный контекст эпохи Хань</h3>
+        <p>
+          После объединения Китая империи нужны были общие нормы легитимности и управления. На фоне
+          конкурирующих традиций (легизм, даосизм, «инь‑ян» и «пять элементов») конфуцианцы искали язык, который
+          соединял бы мораль и космос. Дун Чжуншу предложил синтез: этика и обрядность — «вертикаль» порядка,
+          космология соответствий — «горизонтальная» ткань мира, по которой читаются небесные предупреждения.
+        </p>
+      </article>
+    </section>
+
+    <section id="doctrine" class="grid">
+      <article class="card span-8">
+        <h3>Главные идеи</h3>
+        <h4>1) «Небо и человек» (тянь‑жэнь) и резонанс (ганьин)</h4>
+        <p>
+          Мир пронизан <em>ци</em>; явления созвучны: «стимул — отклик». Небо обладает моральным началом и через
+          астрономические и природные события подаёт знаки правителю. Управление — искусство считывать и
+          исправлять: бедствия — это зов к моральной коррекции.
+        </p>
+        <h4>2) Инь–ян и «пять элементов» как язык политики</h4>
+        <p>
+          Категории у‑син (Дерево, Огонь, Земля, Металл, Вода) описывают циклы изменения. Для Дуна это не «магия»,
+          а <em>коррелятивная</em> схема: добродетели, ритуалы и институты должны быть согласованы с ритмами Неба.
+          Несоответствие порождает «диссонанс» — и, как следствие, бедствия.
+        </p>
+        <h4>3) «Единство великого» и этика управления</h4>
+        <p>
+          Централизованная власть оправдана, если правитель воплощает совокупную добродетель и слушает увещания
+          учёных. Школа ритуала (ли) дисциплинирует общество, но моральное превосходство важнее наказаний.
+        </p>
+      </article>
+      <aside class="card span-4">
+        <h4>Карта соответствий у‑син</h4>
+        <svg viewBox="0 0 560 560" width="100%" height="auto" aria-label="Диаграмма пяти элементов">
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#7cc0ff" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+          <circle cx="280" cy="280" r="260" fill="#0b0f17" stroke="rgba(124,192,255,.25)"/>
+          <!-- Узлы -->
+          <g font-family="system-ui,Arial" font-weight="700" text-anchor="middle" filter="url(#glow)">
+            <g transform="translate(280,40)">
+              <circle r="44" fill="#10243a" stroke="#7cc0ff"/>
+              <text y="6" fill="#e7ecf6">Дерево</text>
+              <text y="26" fill="#a8b3cf" font-weight="600" font-size="12">весна • восток • зелёный</text>
+            </g>
+            <g transform="translate(500,210)">
+              <circle r="44" fill="#10243a" stroke="#7cc0ff"/>
+              <text y="6" fill="#e7ecf6">Огонь</text>
+              <text y="26" fill="#a8b3cf" font-weight="600" font-size="12">лето • юг • красный</text>
+            </g>
+            <g transform="translate(420,460)">
+              <circle r="44" fill="#10243a" stroke="#7cc0ff"/>
+              <text y="6" fill="#e7ecf6">Земля</text>
+              <text y="26" fill="#a8b3cf" font-weight="600" font-size="12">середина • жёлтый</text>
+            </g>
+            <g transform="translate(140,500)">
+              <circle r="44" fill="#10243a" stroke="#7cc0ff"/>
+              <text y="6" fill="#e7ecf6">Металл</text>
+              <text y="26" fill="#a8b3cf" font-weight="600" font-size="12">осень • запад • белый</text>
+            </g>
+            <g transform="translate(40,230)">
+              <circle r="44" fill="#10243a" stroke="#7cc0ff"/>
+              <text y="6" fill="#e7ecf6">Вода</text>
+              <text y="26" fill="#a8b3cf" font-weight="600" font-size="12">зима • север • чёрный</text>
+            </g>
+          </g>
+          <!-- Порождение -->
+          <g stroke="#78a1ff" stroke-width="2" opacity=".9">
+            <path d="M280,84 C420,120 468,168 500,210" fill="none"/>
+            <path d="M500,210 C520,330 480,420 420,460" fill="none"/>
+            <path d="M420,460 C320,520 220,520 140,500" fill="none"/>
+            <path d="M140,500 C80,460 60,330 40,230" fill="none"/>
+            <path d="M40,230 C80,150 180,100 280,84" fill="none"/>
+          </g>
+          <!-- Подавление -->
+          <g stroke="#ff8ab5" stroke-dasharray="6 6" stroke-width="2" opacity=".8">
+            <line x1="280" y1="84" x2="140" y2="500"/>
+            <line x1="500" y1="210" x2="40" y2="230"/>
+            <line x1="420" y1="460" x2="280" y2="84"/>
+            <line x1="140" y1="500" x2="500" y2="210"/>
+            <line x1="40" y1="230" x2="420" y2="460"/>
+          </g>
+        </svg>
+        <p class="note">Диаграмма у‑син: сплошные линии — цикл порождения; штриховые — взаимное сдерживание.
+          В интерпретации Дуна политические дисгармонии читаются как космические несоответствия.</p>
+      </aside>
+    </section>
+
+    <section id="works" class="grid">
+      <article class="card span-8">
+        <h3>Сочинения и текстологические вопросы</h3>
+        <h4>«Пышная роса к “Веснам и Осеням”» (春秋繁露, <em>Чуньцю фанлу</em>)</h4>
+        <p>
+          Главный корпус, традиционно приписываемый Дуну, — 82 главы размышлений над «Веснами и Осенями» в
+          гунъянской трактовке. Текст дошёл в сложной редакционной истории: вероятно, включает более поздние слои.
+          Темы: мораль правителя, космология соответствий, ритуал, язык знамѐний и «резонанса».
+        </p>
+        <h4>«Взаимодействие Неба и людей» (天人感應論)</h4>
+        <p>
+          Трактат и идея, ставшие ключом к конфуцианскому прочтению политических кризисов как моральных сигналов
+          сверху. В поздней традиции текст связывали с именем Дуна как теоретика «ганьин».
+        </p>
+      </article>
+      <aside class="card span-4">
+        <h4>Ключевые понятия</h4>
+        <ul>
+          <li><strong>仁</strong> (жэнь) — человечность, сердечная добродетель.</li>
+          <li><strong>義</strong> (и) — должное/правильность, справедливость.</li>
+          <li><strong>禮</strong> (ли) — ритуал и норма поведения.</li>
+          <li><strong>天–人</strong> — корреляция Неба и человека.</li>
+          <li><strong>感應</strong> — «стимул–отклик» в ткани <em>ци</em>.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="politics" class="grid">
+      <article class="card span-12">
+        <h3>Политическая мысль и советы правителю</h3>
+        <p>
+          В «ответах к престолу» Дун отстаивает верховенство конфуцианской учѐности, укрепление центра и
+          институционализацию обучения (Тайсюэ). Он допускал «жесткость закона», но настаивал на приоритете
+          морального влияния и ритуала. Знаменя (бедствия, небесные явления) — поводы к самокоррекции власти, а
+          учёные должны смело увещевать.
+        </p>
+        <p class="note">
+          Известная формула «<em>упразднить сто школ и чтить лишь конфуцианство</em>» относится к последующей
+          риторической традиции и в деталях оспаривается текстологами; вклад Дуна — в разработке аргументации,
+          объяснявшей, почему конфуцианская норма должна стать основой государства.
+        </p>
+      </article>
+    </section>
+
+    <section id="legacy" class="grid">
+      <article class="card span-8">
+        <h3>Институциональное наследие</h3>
+        <p>
+          Идеи Дуна повлияли на создание/укрепление Национальной академии (Тайсюэ) в Чанъане и на практику отбора
+          кадров из «классиковедов». Конфуцианская текстуальность стала языком легитимации власти, а космология
+          соответствий — общим кодом «чтения» политики и природы на два тысячелетия вперёд.
+        </p>
+      </article>
+      <aside class="card span-4">
+        <h4>Как читать Дуна сегодня</h4>
+        <ul>
+          <li>Не путать <em>коррелятивную</em> космологию с натурфилософским «естествознанием».</li>
+          <li>Видеть в «знамениях» язык этической ответственности власти.</li>
+          <li>Учитывать текстологические слои и поздние редакции.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="gallery" class="grid">
+      <article class="card span-12">
+        <h3>Иллюстрации</h3>
+        <div class="gallery">
+          <figure>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/%E6%AD%B7%E4%BB%A3%E8%81%96%E8%B3%A2%E5%8D%8A%E8%BA%AB%E5%83%8F_%E5%86%8A_%E8%91%A3%E4%BB%B2%E8%88%92_%28Dong_Zhongshu%29.png/800px-%E6%AD%B7%E4%BB%A3%E8%81%96%E8%B3%A2%E5%8D%8A%E8%BA%AB%E5%83%8F_%E5%86%8A_%E8%91%A3%E4%BB%B2%E8%88%92_%28Dong_Zhongshu%29.png" alt="Портрет Дуна Чжуншу" />
+            <figcaption>Портрет Дуна Чжуншу (National Palace Museum / Wikimedia Commons)</figcaption>
+          </figure>
+          <figure>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Yin_yang.svg/768px-Yin_yang.svg.png" alt="Знак инь‑ян как символ космологической дуальности" />
+            <figcaption>Инь‑ян — графический символ дуальности (Wikimedia Commons)</figcaption>
+          </figure>
+        </div>
+      </article>
+    </section>
+
+    <section id="sources" class="grid footer">
+      <article class="card span-12">
+        <h3>Источники и литература для углубления</h3>
+        <ul>
+          <li>Encyclopaedia Britannica: <a href="https://www.britannica.com/biography/Dong-Zhongshu" target="_blank" rel="noreferrer">Dong Zhongshu</a>.</li>
+          <li>Wikipedia: <a href="https://ru.wikipedia.org/wiki/%D0%94%D1%83%D0%BD_%D0%A7%D0%B6%D1%83%D0%BD%D1%88%D1%83" target="_blank" rel="noreferrer">Дун Чжуншу</a> / <a href="https://en.wikipedia.org/wiki/Dong_Zhongshu" target="_blank" rel="noreferrer">en</a>;
+            <a href="https://en.wikipedia.org/wiki/Luxuriant_Dew_of_the_Spring_and_Autumn_Annals" target="_blank" rel="noreferrer">Luxuriant Dew of the Spring and Autumn Annals</a>;
+            <a href="https://en.wikipedia.org/wiki/Ganying" target="_blank" rel="noreferrer">Gǎnyìng</a>.</li>
+          <li>Columbia University Press (перевод): <a href="https://cup.columbia.edu/book/luxuriant-gems-of-the-spring-and-autumn/9780231169325/" target="_blank" rel="noreferrer">Luxuriant Gems of the Spring and Autumn</a>.</li>
+          <li>Chinaknowledge.de: <a href="https://www.chinaknowledge.de/History/Han/personsdongzhongshu.html" target="_blank" rel="noreferrer">Биография</a>; <a href="https://www.chinaknowledge.de/History/Terms/taixue.html" target="_blank" rel="noreferrer">Тайсюэ</a>.</li>
+          <li>Michael Loewe, <em>Dong Zhongshu, a 'Confucian' Heritage and the Chunqiu Fanlu</em> (Brill).</li>
+          <li>Обсуждение формулы «罢黜百家，独尊儒术»: Wang Bingru & Wang Xinheng (2020) — критический обзор.</li>
+        </ul>
+        <p class="note">Этот сайт‑презентация предназначен для чтения с экрана и для печати в PDF (кнопка вверху). Все
+          изображения взяты из открытых источников (Wikimedia Commons) либо созданы внутри страницы.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
